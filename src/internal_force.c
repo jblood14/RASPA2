@@ -2406,14 +2406,14 @@ void CalculateAdsorbateTorsionForce(int m)
     CosPhi2=SQR(CosPhi);
       
       // compute Phi
-      Pb.x=Dab.z*Dbc.y-Dab.y*Dbc.z;
-      Pb.y=Dab.x*Dbc.z-Dab.z*Dbc.x;
-      Pb.z=Dab.y*Dbc.x-Dab.x*Dbc.y;
-      Pc.x=Dbc.y*Dcd.z-Dbc.z*Dcd.y;
-      Pc.y=Dbc.z*Dcd.x-Dbc.x*Dcd.z;
-      Pc.z=Dbc.x*Dcd.y-Dbc.y*Dcd.x;
-      sign=(Dbc.x*(Pc.z*Pb.y-Pc.y*Pb.z)+Dbc.y*(Pb.z*Pc.x-Pb.x*Pc.z)
-            +Dbc.z*(Pc.y*Pb.x-Pc.x*Pb.y));
+      Pb.x=Dab.z*Dcb.y-Dab.y*Dcb.z;
+      Pb.y=Dab.x*Dcb.z-Dab.z*Dcb.x;
+      Pb.z=Dab.y*Dcb.x-Dab.x*Dcb.y;
+      Pc.x=Dcb.y*Ddc.z-Dcb.z*Ddc.y;
+      Pc.y=Dcb.z*Ddc.x-Dcb.x*Ddc.z;
+      Pc.z=Dcb.x*Ddc.y-Dcb.y*Ddc.x;
+      sign=(Dcb.x*(Pc.z*Pb.y-Pc.y*Pb.z)+Dcb.y*(Pb.z*Pc.x-Pb.x*Pc.z)
+            +Dcb.z*(Pc.y*Pb.x-Pc.x*Pb.y));
       Phi=SIGN(acos(CosPhi),sign);
       
       // Add the phase shift factor (for TraPPE)
@@ -2740,14 +2740,14 @@ void CalculateCationTorsionForce(int m)
     CosPhi2=SQR(CosPhi);
       
       // compute Phi
-      Pb.x=Dab.z*Dbc.y-Dab.y*Dbc.z;
-      Pb.y=Dab.x*Dbc.z-Dab.z*Dbc.x;
-      Pb.z=Dab.y*Dbc.x-Dab.x*Dbc.y;
-      Pc.x=Dbc.y*Dcd.z-Dbc.z*Dcd.y;
-      Pc.y=Dbc.z*Dcd.x-Dbc.x*Dcd.z;
-      Pc.z=Dbc.x*Dcd.y-Dbc.y*Dcd.x;
-      sign=(Dbc.x*(Pc.z*Pb.y-Pc.y*Pb.z)+Dbc.y*(Pb.z*Pc.x-Pb.x*Pc.z)
-            +Dbc.z*(Pc.y*Pb.x-Pc.x*Pb.y));
+      Pb.x=Dab.z*Dcb.y-Dab.y*Dcb.z;
+      Pb.y=Dab.x*Dcb.z-Dab.z*Dcb.x;
+      Pb.z=Dab.y*Dcb.x-Dab.x*Dcb.y;
+      Pc.x=Dcb.y*Ddc.z-Dcb.z*Ddc.y;
+      Pc.y=Dcb.z*Ddc.x-Dcb.x*Ddc.z;
+      Pc.z=Dcb.x*Ddc.y-Dcb.y*Ddc.x;
+      sign=(Dcb.x*(Pc.z*Pb.y-Pc.y*Pb.z)+Dcb.y*(Pb.z*Pc.x-Pb.x*Pc.z)
+            +Dcb.z*(Pc.y*Pb.x-Pc.x*Pb.y));
       Phi=SIGN(acos(CosPhi),sign);
       
       // Add the phase shift factor (for TraPPE)
