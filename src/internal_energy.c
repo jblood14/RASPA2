@@ -2173,7 +2173,7 @@ REAL CalculateTorsionEnergy(int Itype,int Iu)
   REAL rbc,energy;
   VECTOR Dab,Dbc,Dcd,dr,ds;
   REAL dot_ab,dot_cd,r,s,sign;
-  REAL CosPhi,Phi,CosPhi2;
+  REAL CosPhi,Phi,CosPhi2,PhiF,CosPhiF,Cos2PhiF;
   VECTOR Pb,Pc;
   REAL *parms;
 
@@ -2220,7 +2220,21 @@ REAL CalculateTorsionEnergy(int Itype,int Iu)
   // Ensure CosPhi is between -1 and 1.
   CosPhi=SIGN(MIN2(fabs(CosPhi),(REAL)1.0),CosPhi);
   CosPhi2=SQR(CosPhi);
-
+    // compute Phi
+    Pb.x=Dab.z*Dbc.y-Dab.y*Dbc.z;
+    Pb.y=Dab.x*Dbc.z-Dab.z*Dbc.x;
+    Pb.z=Dab.y*Dbc.x-Dab.x*Dbc.y;
+    Pc.x=Dbc.y*Dcd.z-Dbc.z*Dcd.y;
+    Pc.y=Dbc.z*Dcd.x-Dbc.x*Dcd.z;
+    Pc.z=Dbc.x*Dcd.y-Dbc.y*Dcd.x;
+    sign=(Dbc.x*(Pc.z*Pb.y-Pc.y*Pb.z)+Dbc.y*(Pb.z*Pc.x-Pb.x*Pc.z)
+          +Dbc.z*(Pc.y*Pb.x-Pc.x*Pb.y));
+    Phi=SIGN(acos(CosPhi),sign);
+    
+    // Add the phase shift factor (for TraPPE)
+    PhiF=Phi+parms[4];
+    CosPhiF=cos(PhiF);
+    Cos2PhiF=SQR(CosPhiF);
   // Note that we can rewrite various terms into CosPhi-contributions using
   // cos(2*Theta)=2*cos(Theta)**2-1
   // cos(3*Theta)=-3*cos(Theta)*(1-SQR(cos(Theta))+CUBE(cos(Theta))
@@ -2320,7 +2334,7 @@ REAL CalculateTorsionEnergy(int Itype,int Iu)
       // p_1/k_B [K]
       // p_2/k_B [K]
       // p_3/k_B [K]
-      energy=parms[0]+(1.0+CosPhi)*(parms[1]+parms[3]-2.0*(CosPhi-1.0)*(parms[2]-2.0*parms[3]*CosPhi));
+      energy=parms[0]+(1.0+CosPhiF)*(parms[1]+parms[3]-2.0*(CosPhiF-1.0)*(parms[2]-2.0*parms[3]*CosPhiF));
       break;
     case CVFF_DIHEDRAL:
       // p_0*(1+cos(p_1*phi-p_2))
@@ -2397,7 +2411,7 @@ REAL CalculateTorsionEnergyAdsorbate(int m)
   REAL rbc,UTorsion;
   VECTOR Dab,Dbc,Dcd,dr,ds;
   REAL dot_ab,dot_cd,r,s,sign;
-  REAL CosPhi,Phi,CosPhi2;
+  REAL CosPhi,Phi,CosPhi2,PhiF,CosPhiF,Cos2PhiF;
   VECTOR Pb,Pc;
   REAL *parms;
 
@@ -2453,6 +2467,24 @@ REAL CalculateTorsionEnergyAdsorbate(int m)
     // Ensure CosPhi is between -1 and 1.
     CosPhi=SIGN(MIN2(fabs(CosPhi),(REAL)1.0),CosPhi);
     CosPhi2=SQR(CosPhi);
+      
+    // compute Phi
+    Pb.x=Dab.z*Dbc.y-Dab.y*Dbc.z;
+    Pb.y=Dab.x*Dbc.z-Dab.z*Dbc.x;
+    Pb.z=Dab.y*Dbc.x-Dab.x*Dbc.y;
+    Pc.x=Dbc.y*Dcd.z-Dbc.z*Dcd.y;
+    Pc.y=Dbc.z*Dcd.x-Dbc.x*Dcd.z;
+    Pc.z=Dbc.x*Dcd.y-Dbc.y*Dcd.x;
+    sign=(Dbc.x*(Pc.z*Pb.y-Pc.y*Pb.z)+Dbc.y*(Pb.z*Pc.x-Pb.x*Pc.z)
+        +Dbc.z*(Pc.y*Pb.x-Pc.x*Pb.y));
+    Phi=SIGN(acos(CosPhi),sign);
+    
+    // Add the phase shift factor (for TraPPE)
+    PhiF=Phi+parms[4];
+    CosPhiF=cos(PhiF);
+    Cos2PhiF=SQR(CosPhiF);
+      
+
 
     switch(Components[Type].TorsionType[i])
     {
@@ -2548,7 +2580,7 @@ REAL CalculateTorsionEnergyAdsorbate(int m)
         // p_1/k_B [K]
         // p_2/k_B [K]
         // p_3/k_B [K]
-        UTorsion+=parms[0]+(1.0+CosPhi)*(parms[1]+parms[3]-2.0*(CosPhi-1.0)*(parms[2]-2.0*parms[3]*CosPhi));
+        UTorsion+=parms[0]+(1.0+CosPhiF)*(parms[1]+parms[3]-2.0*(CosPhiF-1.0)*(parms[2]-2.0*parms[3]*CosPhiF));
         break;
       case CVFF_DIHEDRAL:
         // p_0*(1+cos(p_1*phi-p_2))
@@ -2634,7 +2666,7 @@ REAL CalculateTorsionEnergyCation(int m)
   REAL rbc,UTorsion;
   VECTOR Dab,Dbc,Dcd,dr,ds;
   REAL dot_ab,dot_cd,r,s,sign;
-  REAL CosPhi,Phi,CosPhi2;
+  REAL CosPhi,Phi,CosPhi2,PhiF,CosPhiF,Cos2PhiF;
   VECTOR Pb,Pc;
   REAL *parms;
 
@@ -2689,6 +2721,21 @@ REAL CalculateTorsionEnergyCation(int m)
     // Ensure CosPhi is between -1 and 1.
     CosPhi=SIGN(MIN2(fabs(CosPhi),(REAL)1.0),CosPhi);
     CosPhi2=SQR(CosPhi);
+      // compute Phi
+      Pb.x=Dab.z*Dbc.y-Dab.y*Dbc.z;
+      Pb.y=Dab.x*Dbc.z-Dab.z*Dbc.x;
+      Pb.z=Dab.y*Dbc.x-Dab.x*Dbc.y;
+      Pc.x=Dbc.y*Dcd.z-Dbc.z*Dcd.y;
+      Pc.y=Dbc.z*Dcd.x-Dbc.x*Dcd.z;
+      Pc.z=Dbc.x*Dcd.y-Dbc.y*Dcd.x;
+      sign=(Dbc.x*(Pc.z*Pb.y-Pc.y*Pb.z)+Dbc.y*(Pb.z*Pc.x-Pb.x*Pc.z)
+            +Dbc.z*(Pc.y*Pb.x-Pc.x*Pb.y));
+      Phi=SIGN(acos(CosPhi),sign);
+      
+      // Add the phase shift factor (for TraPPE)
+      PhiF=Phi+parms[4];
+      CosPhiF=cos(PhiF);
+      Cos2PhiF=SQR(CosPhiF);
 
     parms=Components[Type].TorsionArguments[i];
     switch(Components[Type].TorsionType[i])
@@ -2785,7 +2832,7 @@ REAL CalculateTorsionEnergyCation(int m)
         // p_1/k_B [K]
         // p_2/k_B [K]
         // p_3/k_B [K]
-        UTorsion+=parms[0]+(1.0+CosPhi)*(parms[1]+parms[3]-2.0*(CosPhi-1.0)*(parms[2]-2.0*parms[3]*CosPhi));
+        UTorsion+=parms[0]+(1.0+CosPhiF)*(parms[1]+parms[3]-2.0*(CosPhiF-1.0)*(parms[2]-2.0*parms[3]*CosPhiF));
         break;
       case CVFF_DIHEDRAL:
         // p_0*(1+cos(p_1*phi-p_2))

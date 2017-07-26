@@ -894,10 +894,13 @@ REAL PrintInversionBendEnergyStatus(int nr,char *string,int InversionBendType,RE
 
 REAL PrintTorsionEnergyStatus(int nr,char *string,int TorsionType,REAL *parms,REAL Phi)
 {
-  REAL U,CosPhi,CosPhi2;
+  REAL U,CosPhi,CosPhi2,PhiF,CosPhiF,Cos2PhiF;
 
   CosPhi=cos(Phi);
   CosPhi2=SQR(CosPhi);
+    PhiF=Phi+parms[4];
+    CosPhiF=cos(PhiF);
+    Cos2PhiF=SQR(CosPhiF);
   switch(TorsionType)
   {
     case HARMONIC_DIHEDRAL:
@@ -1060,7 +1063,7 @@ REAL PrintTorsionEnergyStatus(int nr,char *string,int TorsionType,REAL *parms,RE
       // p_1/k_B [K]
       // p_2/k_B [K]
       // p_3/k_B [K]
-      U=parms[0]+(1.0+CosPhi)*(parms[1]+parms[3]-2.0*(CosPhi-1.0)*(parms[2]-2.0*parms[3]*CosPhi));
+      U=parms[0]+(1.0+CosPhiF)*(parms[1]+parms[3]-2.0*(CosPhiF-1.0)*(parms[2]-2.0*parms[3]*CosPhiF));
       fprintf(OutputFilePtr[CurrentSystem],"%4d TRAPPE_DIHEDRAL %s, p_0/k_B=%8.5f [K], p_1/k_B=%8.5f [K], p_2/k_B=%8.5f [K], "
                                            "p_3/k_B=%8.5f [K], Phi: %8.5f [degrees], Energy: %8.5f [K] %8.5f [kJ/mol] %8.5f [kcal/mol]\n",
                 nr,
@@ -1069,7 +1072,7 @@ REAL PrintTorsionEnergyStatus(int nr,char *string,int TorsionType,REAL *parms,RE
                 parms[1]*ENERGY_TO_KELVIN,
                 parms[2]*ENERGY_TO_KELVIN,
                 parms[3]*ENERGY_TO_KELVIN,
-                Phi*RAD2DEG,
+                PhiF*RAD2DEG,
                 U*ENERGY_TO_KELVIN,
                 U*ENERGY_TO_KJ_PER_MOL,
                 U*ENERGY_TO_KCAL_PER_MOL);

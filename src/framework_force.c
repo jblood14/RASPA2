@@ -1141,7 +1141,7 @@ void CalculateFrameworkTorsionForce(void)
   REAL d,e,rbc,U,DF;
   VECTOR Dab,Dcb,Ddc,dr,ds;
   REAL dot_ab,dot_cd,r,s,sign;
-  REAL CosPhi,Phi,CosPhi2,SinPhi;
+  REAL CosPhi,Phi,CosPhi2,SinPhi,PhiF,CosPhiF,Cos2PhiF;
   VECTOR dtA,dtB,dtC,dtD,Pb,Pc;
   VECTOR fa,fb,fc,fd;
   REAL *parms;
@@ -1203,7 +1203,23 @@ void CalculateFrameworkTorsionForce(void)
         // Ensure CosPhi is between -1 and 1.
         CosPhi=SIGN(MIN2(fabs(CosPhi),(REAL)1.0),CosPhi);
         CosPhi2=SQR(CosPhi);
-
+          
+          // compute Phi
+          Pb.x=Dab.z*Dbc.y-Dab.y*Dbc.z;
+          Pb.y=Dab.x*Dbc.z-Dab.z*Dbc.x;
+          Pb.z=Dab.y*Dbc.x-Dab.x*Dbc.y;
+          Pc.x=Dbc.y*Dcd.z-Dbc.z*Dcd.y;
+          Pc.y=Dbc.z*Dcd.x-Dbc.x*Dcd.z;
+          Pc.z=Dbc.x*Dcd.y-Dbc.y*Dcd.x;
+          sign=(Dbc.x*(Pc.z*Pb.y-Pc.y*Pb.z)+Dbc.y*(Pb.z*Pc.x-Pb.x*Pc.z)
+                +Dbc.z*(Pc.y*Pb.x-Pc.x*Pb.y));
+          Phi=SIGN(acos(CosPhi),sign);
+          
+          // Add the phase shift factor (for TraPPE)
+          PhiF=Phi+parms[4];
+          CosPhiF=cos(PhiF);
+          Cos2PhiF=SQR(CosPhiF);
+          
         switch(Framework[CurrentSystem].TorsionType[f1][i])
         {
           case HARMONIC_DIHEDRAL:
@@ -1308,8 +1324,8 @@ void CalculateFrameworkTorsionForce(void)
             // p_1/k_B [K]
             // p_2/k_B [K]
             // p_3/k_B [K]
-            U=parms[0]+(1.0+CosPhi)*(parms[1]+parms[3]-2.0*(CosPhi-1.0)*(parms[2]-2.0*parms[3]*CosPhi));
-            DF=parms[1]-4.0*parms[2]*CosPhi+3.0*parms[3]*(4.0*CosPhi2-1.0);
+            U=parms[0]+(1.0+CosPhiF)*(parms[1]+parms[3]-2.0*(CosPhiF-1.0)*(parms[2]-2.0*parms[3]*CosPhiF));
+            DF=parms[1]-4.0*parms[2]*CosPhFi+3.0*parms[3]*(4.0*Cos2PhiF-1.0);
             break;
           case CVFF_DIHEDRAL:
             // p_0*(1+cos(p_1*phi-p_2))

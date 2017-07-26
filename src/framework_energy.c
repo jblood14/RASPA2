@@ -1092,7 +1092,7 @@ REAL CalculateFrameworkTorsionEnergy(int flag,int f2,int atom_id)
   REAL rbc,U;
   VECTOR Dab,Dcb,Ddc,dr,ds;
   REAL dot_ab,dot_cd,r,s,sign;
-  REAL CosPhi,Phi,CosPhi2,SinPhi,UHostTorsion;
+  REAL CosPhi,Phi,CosPhi2,SinPhi,UHostTorsion,PhiF,CosPhiF,Cos2PhiF;
   VECTOR Pb,Pc;
   REAL *parms;
 
@@ -1158,6 +1158,22 @@ REAL CalculateFrameworkTorsionEnergy(int flag,int f2,int atom_id)
           CosPhi2=SQR(CosPhi);
 
           parms=Framework[CurrentSystem].TorsionArguments[f1][i];
+
+            // compute Phi
+            Pb.x=Dab.z*Dbc.y-Dab.y*Dbc.z;
+            Pb.y=Dab.x*Dbc.z-Dab.z*Dbc.x;
+            Pb.z=Dab.y*Dbc.x-Dab.x*Dbc.y;
+            Pc.x=Dbc.y*Dcd.z-Dbc.z*Dcd.y;
+            Pc.y=Dbc.z*Dcd.x-Dbc.x*Dcd.z;
+            Pc.z=Dbc.x*Dcd.y-Dbc.y*Dcd.x;
+            sign=(Dbc.x*(Pc.z*Pb.y-Pc.y*Pb.z)+Dbc.y*(Pb.z*Pc.x-Pb.x*Pc.z)
+                  +Dbc.z*(Pc.y*Pb.x-Pc.x*Pb.y));
+            Phi=SIGN(acos(CosPhi),sign);
+            
+            // Add the phase shift factor (for TraPPE)
+            PhiF=Phi+parms[4];
+            CosPhiF=cos(PhiF);
+            Cos2PhiF=SQR(CosPhiF);
 
           switch(Framework[CurrentSystem].TorsionType[f1][i])
           {
@@ -1255,7 +1271,7 @@ REAL CalculateFrameworkTorsionEnergy(int flag,int f2,int atom_id)
               // p_1/k_B [K]
               // p_2/k_B [K]
               // p_3/k_B [K]
-              U=parms[0]+(1.0+CosPhi)*(parms[1]+parms[3]-2.0*(CosPhi-1.0)*(parms[2]-2.0*parms[3]*CosPhi));
+              U=parms[0]+(1.0+CosPhiF)*(parms[1]+parms[3]-2.0*(CosPhiF-1.0)*(parms[2]-2.0*parms[3]*CosPhiF));
               break;
             case CVFF_DIHEDRAL:
               // p_0*(1+cos(p_1*phi-p_2))
