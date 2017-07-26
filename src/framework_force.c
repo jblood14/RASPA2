@@ -1325,7 +1325,7 @@ void CalculateFrameworkTorsionForce(void)
             // p_2/k_B [K]
             // p_3/k_B [K]
             U=parms[0]+(1.0+CosPhiF)*(parms[1]+parms[3]-2.0*(CosPhiF-1.0)*(parms[2]-2.0*parms[3]*CosPhiF));
-            DF=parms[1]-4.0*parms[2]*CosPhFi+3.0*parms[3]*(4.0*Cos2PhiF-1.0);
+            DF=parms[1]-4.0*parms[2]*CosPhiF+3.0*parms[3]*(4.0*Cos2PhiF-1.0);
             break;
           case CVFF_DIHEDRAL:
             // p_0*(1+cos(p_1*phi-p_2))
